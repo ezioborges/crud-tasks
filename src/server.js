@@ -1,10 +1,8 @@
 import http from 'node:http'
 import { json } from './middleware/json.js'
 import { routes } from './routes.js'
-import { Database } from './database.js'
-import { randomUUID } from 'node:crypto'
+import { extractQueryParams } from './utils/extract-query-params.js'
 
-const database = new Database
 
 const server = http.createServer(async (req, res) => {
     const { method, url } = req
@@ -12,10 +10,19 @@ const server = http.createServer(async (req, res) => {
     await json(req, res)
 
     const route = routes.find((route) => {
-        return route.method === method && route.url === url
+        return route.method === method && route.url.test(url)
     })
 
     if(route) {
+        const routeParams = req.url.match(route.url)
+
+        // const { query, ...params } = routeParams.groups
+
+        // req.params = params
+        // req.query = query ? extractQueryParams(query) : {}
+
+        req.params = { ...routeParams.groups }
+
         return route.handler(req, res)
     }
 
