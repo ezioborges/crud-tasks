@@ -16,18 +16,9 @@ const server = http.createServer(async (req, res) => {
     })
 
     if(route) {
-        const { task, description } = req.body
-
-        const newTask = {
-            id: randomUUID(),
-            task,
-            description
-        }
-
-        database.insert('tasks', newTask)
-
-        return res.writeHead(201).end()
+        return route.handler(req, res)
     }
+
     return res.writeHead(404).end();
 })
 
