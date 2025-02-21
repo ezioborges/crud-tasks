@@ -39,15 +39,13 @@ export class Database {
 
     update(table, id, data) {
         let actualData = null
-        const rowIndex = this.#database[table].findIndex(row =>{
-            // pega a informação antiga
+        const rowIndex = this.#database[table].findIndex(row => {
+            // pega a informação do dado no array e coloca dentro do actualData
             if(row.id === id){
                 actualData = row
                 return true
             }
         })
-        console.log("🚀 ~ Database ~ update ~ actualData:", actualData)
-        console.log("🚀 ~ Database ~ update ~ rowIndex:", { ...actualData, ...data })
 
         if (rowIndex > -1) {
             this.#database[table][rowIndex] = { ...actualData, ...data }
@@ -60,6 +58,24 @@ export class Database {
 
         if (rowIndex > -1) {
             this.#database[table].splice(rowIndex, 1)
+            this.#persist()
+        }
+    }
+
+    complitedTask(table, id, data) {
+        let actualData = null
+        const rowIndex = this.#database[table].findIndex(row => {
+            if(row.id === id) {
+                actualData = row
+                return true
+            }
+        })
+
+        console.log('aqui é no database');
+        
+
+        if (rowIndex > -1) {
+            this.#database[table][rowIndex] = { ...actualData, ... data}
             this.#persist()
         }
     }

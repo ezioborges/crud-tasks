@@ -19,10 +19,9 @@ export const routes = [
             description,
             completed_at: null,
             created_at: created,
-            updated_at,
+            updated_at: null,
         }
-        console.log("🚀 ~ newTask:", newTask)
-
+        
         database.insert('tasks', newTask)
 
         return res.writeHead(201).end()
@@ -32,7 +31,7 @@ export const routes = [
         method: 'GET',
         url: buildRoutePath('/tasks'),
         handler: (req, res) => {
-            const tasks = database.select('tasks')
+            const tasks = database.select('tasks')            
 
             return res.writeHead(200).end(JSON.stringify(tasks))
         }
@@ -42,15 +41,11 @@ export const routes = [
         url: buildRoutePath('/tasks/:id'),
         handler: (req, res) => {
             const { id } = req.params;
-            const { title, description, completed_at } = req.body  
-            
-            console.log('put ===> ', req.params);
-            
+            const { title, description } = req.body              
             
             database.update('tasks', id, {
                 title,
                 description,
-                completed_at,
                 updated_at: new Date(),
             })
             
@@ -68,5 +63,21 @@ export const routes = [
 
             return res.writeHead(200).end()
         } 
+    },
+    {
+        method: 'PATCH',
+        url: buildRoutePath('/tasks/:id'),
+        handler: (req, res) => {
+            const { id } = req.params
+
+            console.log('aqui veio');
+            
+
+            database.complitedTask('tasks', id, {
+                completed_at: new Date()
+            })
+
+            return res.writeHead(204).end()
+        }
     }
 ]
