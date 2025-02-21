@@ -9,7 +9,7 @@ export const routes = [
         method: 'POST',
         url: buildRoutePath('/tasks'),
         handler: (req, res) => {
-        const { title, description, updated_at } = req.body
+        const { title, description } = req.body
 
         const created = new Date();
 
@@ -21,10 +21,19 @@ export const routes = [
             created_at: created,
             updated_at: null,
         }
-        
+
         database.insert('tasks', newTask)
 
         return res.writeHead(201).end()
+        }
+    },
+    {
+        method: 'POST',
+        url: buildRoutePath('/tasks/csv-tasks'),
+        handler: (req, res) => {
+            database.insertCSV('tasks')
+
+            return res.writeHead(204).end()
         }
     },
     {
