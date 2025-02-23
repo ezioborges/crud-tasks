@@ -1,6 +1,8 @@
 import { Database } from "./database.js";
 import { randomUUID } from "node:crypto";
-import { buildRoutePath } from './utils/build-route-path.js'
+import { buildRoutePath } from './utils/build-route-path.js';
+import { parse } from 'csv-parse'
+import { createReadStream } from "node:fs"
 
 const database = new Database()
 
@@ -31,8 +33,29 @@ export const routes = [
         method: 'POST',
         url: buildRoutePath('/tasks/csv-tasks'),
         handler: (req, res) => {
-            database.insertCSV('tasks')
+            createReadStream('./tasks-node.csv')
+                .pipe(parse({ delimiter: ",", from_line: 2 }))
+                .on("data", (row) => {
+                    const objTransforCSV = { ...row }
+                    
+                    const newTask = {
+                        id: randomUUID(),
+                        title: objTransforCSV['0'],
+                        description: objTransforCSV['1'],
+                        completed_at: null,
+                        created_at: new Date(),
+                        updated_at: null,
+                    }
 
+                    database.insert('tasks', newTask)
+                })
+                .on("end", () => {
+                    console.log("Finished!");
+                })
+                .on("error", (error) => {
+                    console.error(error.message);
+                })
+            
             return res.writeHead(204).end()
         }
     },
@@ -77,10 +100,7 @@ export const routes = [
         method: 'PATCH',
         url: buildRoutePath('/tasks/:id'),
         handler: (req, res) => {
-            const { id } = req.params
-
-            console.log('aqui veio');
-            
+            const { id } = req.params            
 
             database.complitedTask('tasks', id, {
                 completed_at: new Date()

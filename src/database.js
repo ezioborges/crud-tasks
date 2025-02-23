@@ -1,4 +1,4 @@
-import { promises as fs, createReadStream } from 'node:fs'
+import { promises as fs } from 'node:fs'
 
 const databasePath = new URL('../db.json', import.meta.url)
 
@@ -20,7 +20,8 @@ export class Database {
     }
 
     insert(table, data) {
-        if(Array.isArray(this.database[table])) {
+        if (Array.isArray(this.database[table])) {
+            console.log("insert ===> ", data)
             this.database[table].push(data)
         } else {
             this.database[table] = [data]
@@ -29,16 +30,6 @@ export class Database {
         this.#persist()
 
         return data
-    }
-
-    insertCSV(table) {
-        let list = []
-        createReadStream('./tasks-node.csv')
-        .on("data", async function(data) {
-            list.push(data)
-            
-        })
-        console.log(list.toString());
     }
 
     select(table) {
